@@ -38,6 +38,7 @@ jobs:
           host: 18.231.151.119
           username: ubuntu
           key: ${{ secrets.SERVER_SSH_KEY }}
+          timeout: 600   
           script: |
             kubectl set image deployment/frontend web=$IMAGE_NAME:$IMAGE_TAG --namespace=app-demo
             kubectl rollout restart deployment/frontend --namespace=app-demo
