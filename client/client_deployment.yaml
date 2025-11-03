@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: angular-client
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: angular-client
+  template:
+    metadata:
+      labels:
+        app: angular-client
+    spec:
+      containers:
+      - name: nginx
+        image: vininobre/angular-ecommerce-app-client:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 80

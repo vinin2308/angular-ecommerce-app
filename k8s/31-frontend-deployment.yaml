@@ -18,7 +18,8 @@ spec:
     spec:
       containers:
         - name: web
-          image: pedrobrantis/frontend:latest
+          image: vininobre/frontend:latest
+
           imagePullPolicy: Always
           ports:
             - containerPort: 80
