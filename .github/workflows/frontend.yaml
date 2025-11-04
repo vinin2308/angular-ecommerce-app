@@ -2,57 +2,46 @@
 # Nome do seu workflow
 name: CI/CD - Build (DockerHub) e Deploy para K3s (AWS)
 
-# Gatilho (Trigger): Rodar sempre que houver um push na branch 'main'
 on:
   push:
-    branches: [ master ] # Mude para 'master' se for o caso
+    branches: [ master ]
 
 jobs:
-  # --------------------------------------------------
-  # JOB 1: CONSTRUIR E ENVIAR IMAGENS PARA O DOCKER HUB
-  # --------------------------------------------------
+  # JOB 1:iamgens
   build-and-push:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Baixar o seu código do repositório
       - name: Checkout do código
         uses: actions/checkout@v3
 
-      # 2. Configurar o Docker Buildx
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
-      # 3. Fazer login no Docker Hub
       - name: Login no Docker Hub
         uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
 
-        # 4. Build e Push do Backend
       - name: Build e Push do Frontend
         uses: docker/build-push-action@v4
         with:
-          context: ./backend # Confira se este é o caminho da pasta do frontend
+          context: ./backend 
           push: true
           tags: vininobre/backend:latest
 
-      # 4. Build e Push do Frontend
       - name: Build e Push do Frontend
         uses: docker/build-push-action@v4
         with:
-          context: ./client # Confira se este é o caminho da pasta do frontend
+          context: ./client 
           push: true
           tags: vininobre/frontend:latest
 
 
-  # --------------------------------------------------
-  # JOB 2: CONECTAR NA INSTÂNCIA AWS (K3s) E ATUALIZAR
-  # --------------------------------------------------
   deploy-to-k3s:
-    runs-on: ubuntu-latest
-    needs: build-and-push # Só rodar DEPOIS que as imagens forem enviadas
+    runs-on: ubuntu
+    needs: build-and-push 
 
     steps:
       - name: Deploy na Instância K3s via SSH
@@ -63,7 +52,7 @@ jobs:
           key: ${{ secrets.AWS_SSH_KEY }}
           port: 22
 
-          # Comandos que serão executados DENTRO da sua instância EC2
+          # comandos na instancia K3s
           script: |
             echo "Conectado à instância K3s..."
 
