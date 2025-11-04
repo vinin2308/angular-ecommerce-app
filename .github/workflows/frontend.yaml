@@ -1,6 +1,6 @@
 
 # Nome do seu workflow
-name: CI/CD - Build (DockerHub) e Deploy para K3s (AWS)
+name: CI/CD 
 
 on:
   push:
@@ -40,11 +40,11 @@ jobs:
 
 
   deploy-to-k3s:
-    runs-on: ubuntu
+    runs-on: ubuntu-latest
     needs: build-and-push 
 
     steps:
-      - name: Deploy na Instância K3s via SSH
+      - name: Deploy k3s
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.AWS_HOST }}
@@ -56,11 +56,10 @@ jobs:
           script: |
             echo "Conectado à instância K3s..."
 
-            # O K3s usa 'k3s kubectl' e pode precisar de sudo
-            echo "Forçando reinicialização do Backend..."
+            echo "reinicialização do Backend"
             sudo /usr/local/bin/k3s kubectl rollout restart deployment backend -n app-demo
 
-            echo "Forçando reinicialização do Frontend..."
+            echo "reinicialização do Frontend"
             sudo /usr/local/bin/k3s kubectl rollout restart deployment frontend -n app-demo
 
-            echo "Deploy concluído!"
+            echo "Implantação concluída com sucesso!"
