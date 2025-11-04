@@ -36,7 +36,7 @@ jobs:
         with:
           context: ./backend # Confira se este é o caminho da pasta do backend
           push: true
-          tags: marciojeandev/backend-deploy:latest
+          tags: pedrobrantis/backend:latest
 
       # 5. Build e Push do Frontend
       - name: Build e Push do Frontend
@@ -44,7 +44,8 @@ jobs:
         with:
           context: ./client # Confira se este é o caminho da pasta do frontend
           push: true
-          tags: marciojeandev/frontend-deploy:latest
+          tags: vininobre/frontend:latest
+
 
   # --------------------------------------------------
   # JOB 2: CONECTAR NA INSTÂNCIA AWS (K3s) E ATUALIZAR
