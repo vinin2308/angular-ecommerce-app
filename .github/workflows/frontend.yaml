@@ -45,4 +45,4 @@ jobs:
           echo "Atualizando imagem do frontend..."
           kubectl set image deployment/frontend web=$IMAGE_NAME:$IMAGE_TAG --namespace=app-demo
           kubectl rollout restart deployment/frontend --namespace=app-demo
-          kubectl rollout status deployment/frontend --namespace=app-demo --timeout=10m
+          kubectl rollout status deployment/frontend --namespace=app-demo --timeout=11m
