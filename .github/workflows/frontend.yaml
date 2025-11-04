@@ -3,7 +3,7 @@ name: CI/CD Frontend Kubernetes
 on:
   push:
     branches:
-      - master  # roda sempre que fizer push na branch master
+      - master  # roda sempre que houver push na master
 
 env:
   IMAGE_NAME: vininobre/frontend
@@ -14,32 +14,35 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1️⃣ Baixar o código
-      - name: Checkout do repositório
+      # 1️⃣ Checkout do repositório
+      - name: Checkout
         uses: actions/checkout@v4
 
       # 2️⃣ Login no Docker Hub
-      - name: Login no Docker Hub
+      - name: Login Docker Hub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
 
-      # 3️⃣ Construir e enviar imagem Docker
-      - name: Construir e enviar imagem Docker
+      # 3️⃣ Build e push da imagem Docker
+      - name: Build and Push Docker Image
         run: |
           docker build -t $IMAGE_NAME:$IMAGE_TAG ./client
           docker push $IMAGE_NAME:$IMAGE_TAG
 
-      # 4️⃣ Acessar o cluster Kubernetes e atualizar o deploy
-      - name: Atualizar deploy no Kubernetes
-        uses: appleboy/ssh-action@v0.1.7
+      # 4️⃣ Instalar kubectl
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v3
         with:
-          host: 18.231.151.119
-          username: ubuntu
-          key: ${{ secrets.SERVER_SSH_KEY }}
-          timeout: 20m    
-          script: |
-            kubectl set image deployment/frontend web=$IMAGE_NAME:$IMAGE_TAG --namespace=app-demo
-            kubectl rollout restart deployment/frontend --namespace=app-demo
-            kubectl rollout status deployment/frontend --namespace=app-demo
+          version: 'latest'
+
+      # 5️⃣ Deploy no Kubernetes
+      - name: Deploy to Kubernetes
+        env:
+          KUBECONFIG: ${{ secrets.KUBECONFIG }}
+        run: |
+          echo "Atualizando imagem do frontend..."
+          kubectl set image deployment/frontend web=$IMAGE_NAME:$IMAGE_TAG --namespace=app-demo
+          kubectl rollout restart deployment/frontend --namespace=app-demo
+          kubectl rollout status deployment/frontend --namespace=app-demo --timeout=10m
