@@ -1,13 +1,10 @@
-
-# Nome do seu workflow
-name: CI/CD 
+name: CI/CD
 
 on:
   push:
     branches: [ master ]
 
 jobs:
-  # JOB 1:iamgens
   build-and-push:
     runs-on: ubuntu-latest
 
@@ -24,24 +21,27 @@ jobs:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
 
-      - name: Build e Push do Frontend
+      - name: Build e Push do Backend
         uses: docker/build-push-action@v4
         with:
-          context: ./backend 
+          context: ./backend
           push: true
-          tags: vininobre/backend:latest
+          tags: |
+            vininobre/backend:latest
+            vininobre/backend:${{ github.sha }}
 
       - name: Build e Push do Frontend
         uses: docker/build-push-action@v4
         with:
-          context: ./client 
+          context: ./client
           push: true
-          tags: vininobre/frontend:latest
-
+          tags: |
+            vininobre/frontend:latest
+            vininobre/frontend:${{ github.sha }}
 
   deploy-to-k3s:
     runs-on: ubuntu-latest
-    needs: build-and-push 
+    needs: build-and-push
 
     steps:
       - name: Deploy k3s
@@ -51,15 +51,17 @@ jobs:
           username: ${{ secrets.AWS_USERNAME }}
           key: ${{ secrets.AWS_SSH_KEY }}
           port: 22
-
-          # comandos na instancia K3s
           script: |
-            echo "Conectado à inStância K3s..."
+            echo "Conectado à instância K3s..."
 
-            echo "reinicialização do Backend"
-            sudo /usr/local/bin/k3s kubectl rollout restart deployment backend -n app-demo
+            echo "Atualizando Backend com nova imagem"
+            sudo /usr/local/bin/k3s kubectl set image deployment/backend app=vininobre/backend:${{ github.sha }} -n app-demo
 
-            echo "reinicialização do Frontend"
-            sudo /usr/local/bin/k3s kubectl rollout restart deployment frontend -n app-demo
+            echo "Atualizando Frontend com nova imagem"
+            sudo /usr/local/bin/k3s kubectl set image deployment/frontend web=vininobre/frontend:${{ github.sha }} -n app-demo
 
-            echo "Implantação concluída com sucesso!"
+            echo "Aguardando rollout concluir..."
+            sudo /usr/local/bin/k3s kubectl rollout status deployment/backend -n app-demo
+            sudo /usr/local/bin/k3s kubectl rollout status deployment/frontend -n app-demo
+
+            echo "✅ Deploy atualizado com sucesso!"
