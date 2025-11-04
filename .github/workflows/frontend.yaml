@@ -34,7 +34,7 @@ jobs:
       - name: Build e Push do Frontend
         uses: docker/build-push-action@v4
         with:
-          context: ./backend# Confira se este é o caminho da pasta do frontend
+          context: ./backend # Confira se este é o caminho da pasta do frontend
           push: true
           tags: vininobre/backend:latest
 
