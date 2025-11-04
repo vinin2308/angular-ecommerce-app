@@ -30,15 +30,8 @@ jobs:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
 
-      # 4. Build e Push do Backend
-      - name: Build e Push do Backend
-        uses: docker/build-push-action@v4
-        with:
-          context: ./backend # Confira se este é o caminho da pasta do backend
-          push: true
-          tags: pedrobrantis/backend:latest
 
-      # 5. Build e Push do Frontend
+      # 4. Build e Push do Frontend
       - name: Build e Push do Frontend
         uses: docker/build-push-action@v4
         with:
