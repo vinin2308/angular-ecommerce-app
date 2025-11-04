@@ -54,7 +54,7 @@ jobs:
 
           # comandos na instancia K3s
           script: |
-            echo "Conectado à instância K3s..."
+            echo "Conectado à intância K3s..."
 
             echo "reinicialização do Backend"
             sudo /usr/local/bin/k3s kubectl rollout restart deployment backend -n app-demo
